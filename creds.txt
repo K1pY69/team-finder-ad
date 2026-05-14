@@ -1,0 +1,8 @@
+# Демо-учётные записи (вымышленные персоны, только для локальной разработки)
+# Формат: email<TAB>password — логин в Django = username из readme / create_test_users
+
+kirill.morozov92@gmail.com	K7_moroz!spring
+svetlana.kozlova.work@yandex.ru	TeaRabbit#44
+nikita.orlov.dev@mail.ru	RiverDjango_19
+olga.petrova.tech@gmail.com	PixelGarden8*
+maintainer.platform@tools.dev	SysVault_404secure

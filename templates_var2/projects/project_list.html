@@ -1,0 +1,57 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Актуальные проекты{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/project_list.css' %}">
+{% endblock %}
+
+{% with page_id="projects-list" %}
+{% block content %}
+<div class="project-container">
+    <div class="project-header">
+        <h2 class="project-title">Актуальные проекты</h2>
+        {% if request.user.is_authenticated %}
+            <a href="/projects/create-project" class="black-button">+ Создать проект</a>
+        {% endif %}
+    </div>
+    <p class="project-subtitle">Найдите интересный проект и присоединитесь к команде</p>
+
+    <div class="projects-grid">
+        {% for project in projects %}
+        {% include 'includes/project-card.html' %}
+        {% empty %}
+        {% if request.user.is_authenticated %}
+        {% include 'includes/empty-project-card.html' with empty_title="Пока нет проектов" empty_message="Создавайте проекты и делитесь ими с другими пользователями!" button_link="/projects/create-project" button_text="+ Создать проект" %}
+        {% else %}
+        {% include 'includes/empty-project-card.html' with empty_title="Пока нет проектов" empty_message="Создавайте проекты и делитесь ими с другими пользователями!" %}
+        {% endif %}
+        {% endfor %}
+    </div>
+
+    {% if projects.paginator.num_pages > 1 %}
+    <nav class="pagination" aria-label="Пагинация проектов">
+        {% if projects.has_previous %}
+        <a class="pagination-link" href="?page={{ projects.previous_page_number }}">&#8592;</a>
+        {% endif %}
+
+        {% for page_num in projects.paginator.page_range %}
+            {% if page_num == projects.number %}
+            <span class="pagination-link active">{{ page_num }}</span>
+            {% else %}
+            <a class="pagination-link" href="?page={{ page_num }}">{{ page_num }}</a>
+            {% endif %}
+        {% endfor %}
+
+        {% if projects.has_next %}
+        <a class="pagination-link" href="?page={{ projects.next_page_number }}">&#8594;</a>
+        {% endif %}
+    </nav>
+    {% endif %}
+
+    {% include 'includes/project-fav-toggle.js' %}
+</div>
+
+{% endblock %}
+{% endwith %}

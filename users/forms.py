@@ -1,15 +1,16 @@
 import re
-from urllib.parse import urlparse
 
 from django import forms
 from django.contrib.auth import authenticate
 
+from team_finder.mixins import GithubUrlMixin
+from users.constants import NAME_MAX_LENGTH
 from users.models import User
 
 
 class RegisterForm(forms.Form):
-    name = forms.CharField(max_length=124, label="Имя")
-    surname = forms.CharField(max_length=124, label="Фамилия")
+    name = forms.CharField(max_length=NAME_MAX_LENGTH, label="Имя")
+    surname = forms.CharField(max_length=NAME_MAX_LENGTH, label="Фамилия")
     email = forms.EmailField(label="Email")
     password = forms.CharField(widget=forms.PasswordInput, label="Пароль")
 
@@ -34,27 +35,13 @@ class LoginForm(forms.Form):
         return cleaned
 
 
-class EditProfileForm(forms.ModelForm):
+class EditProfileForm(GithubUrlMixin, forms.ModelForm):
     class Meta:
         model = User
         fields = ["name", "surname", "email", "avatar", "about", "phone", "github_url"]
         widgets = {
             "about": forms.Textarea(attrs={"rows": 4}),
         }
-
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-        self.fields["name"].label = "Имя"
-        self.fields["surname"].label = "Фамилия"
-        self.fields["email"].label = "Email"
-        self.fields["email"].required = True
-        self.fields["avatar"].label = "Фото профиля"
-        self.fields["avatar"].required = False
-        self.fields["about"].label = "О себе"
-        self.fields["phone"].label = "Телефон"
-        self.fields["phone"].required = False
-        self.fields["github_url"].label = "GitHub"
-        self.fields["github_url"].required = False
 
     def clean_phone(self):
         phone = (self.cleaned_data.get("phone") or "").strip()
@@ -74,15 +61,6 @@ class EditProfileForm(forms.ModelForm):
             raise forms.ValidationError("Такой номер телефона уже зарегистрирован")
         return phone
 
-    def clean_github_url(self):
-        url = (self.cleaned_data.get("github_url") or "").strip()
-        if not url:
-            return url
-        parsed = urlparse(url)
-        if not parsed.scheme or "github.com" not in parsed.netloc:
-            raise forms.ValidationError("Ссылка должна вести на GitHub (github.com)")
-        return url
-
 
 class ChangePasswordForm(forms.Form):
     old_password = forms.CharField(widget=forms.PasswordInput, label="Старый пароль")
@@ -101,8 +79,8 @@ class ChangePasswordForm(forms.Form):
 
     def clean(self):
         cleaned = super().clean()
-        p1 = cleaned.get("new_password1")
-        p2 = cleaned.get("new_password2")
-        if p1 and p2 and p1 != p2:
+        new_password = cleaned.get("new_password1")
+        confirm_password = cleaned.get("new_password2")
+        if new_password and confirm_password and new_password != confirm_password:
             raise forms.ValidationError("Новые пароли не совпадают")
         return cleaned

@@ -1,6 +1,12 @@
-from django.core.management.base import BaseCommand
+import json
+import os
+
 from django.contrib.auth.models import User
+from django.core.management.base import BaseCommand
+
 from projects.models import Project
+
+DEFAULT_JSON = os.path.join(os.path.dirname(__file__), "test_projects.json")
 
 
 class Command(BaseCommand):
@@ -22,94 +28,28 @@ class Command(BaseCommand):
             action="store_true",
             help="Clear all existing projects before creating",
         )
+        parser.add_argument(
+            "--file",
+            type=str,
+            default=DEFAULT_JSON,
+            help="Path to JSON file with projects data (default: test_projects.json)",
+        )
 
     def handle(self, *args, **options):
         overwrite = options["force"]
         target_user = options["user"]
         wipe = options["clear"]
+        json_path = options["file"]
 
-        catalogue = [
-            {
-                "name": "Корпоративный портал",
-                "description": "Внутренний портал для сотрудников компании с системой документооборота, календарем и задачами.",
-                "github_url": "https://github.com/company/corporate-portal",
-                "status": "in_progress",
-                "owner_username": "kirill_morozov",
-                "participants_usernames": [
-                    "kirill_morozov",
-                    "svetlana_kozlova",
-                    "nikita_orlov",
-                ],
-            },
-            {
-                "name": "Интернет-магазин",
-                "description": "Платформа для онлайн-продаж с интеграцией платежных систем и CRM.",
-                "github_url": "https://github.com/company/e-shop",
-                "status": "open",
-                "owner_username": "svetlana_kozlova",
-                "participants_usernames": [
-                    "svetlana_kozlova",
-                    "kirill_morozov",
-                    "olga_petrova",
-                ],
-            },
-            {
-                "name": "Мобильное приложение",
-                "description": "Кроссплатформенное мобильное приложение для клиентов компании.",
-                "github_url": "https://github.com/company/mobile-app",
-                "status": "in_progress",
-                "owner_username": "nikita_orlov",
-                "participants_usernames": ["nikita_orlov", "olga_petrova"],
-            },
-            {
-                "name": "CRM система",
-                "description": "Система управления взаимоотношениями с клиентами с аналитикой и отчетами.",
-                "github_url": "https://github.com/company/crm",
-                "status": "closed",
-                "owner_username": "olga_petrova",
-                "participants_usernames": ["olga_petrova", "svetlana_kozlova"],
-            },
-            {
-                "name": "API Gateway",
-                "description": "Центральный шлюз для микросервисной архитектуры с аутентификацией и маршрутизацией.",
-                "github_url": "https://github.com/company/api-gateway",
-                "status": "completed",
-                "owner_username": "team_admin",
-                "participants_usernames": ["team_admin", "kirill_morozov"],
-            },
-            {
-                "name": "Аналитическая платформа",
-                "description": "Система сбора и визуализации данных с дашбордами и отчетностью.",
-                "github_url": "https://github.com/company/analytics",
-                "status": "open",
-                "owner_username": "svetlana_kozlova",
-                "participants_usernames": [
-                    "svetlana_kozlova",
-                    "nikita_orlov",
-                    "team_admin",
-                ],
-            },
-            {
-                "name": "Чат-бот поддержки",
-                "description": "AI-powered чат-бот для автоматизации поддержки клиентов.",
-                "github_url": "https://github.com/company/support-bot",
-                "status": "in_progress",
-                "owner_username": "kirill_morozov",
-                "participants_usernames": ["kirill_morozov", "olga_petrova"],
-            },
-            {
-                "name": "DevOps платформа",
-                "description": "Инструменты для CI/CD, мониторинга и управления инфраструктурой.",
-                "github_url": "https://github.com/company/devops-platform",
-                "status": "in_progress",
-                "owner_username": "team_admin",
-                "participants_usernames": [
-                    "team_admin",
-                    "svetlana_kozlova",
-                    "nikita_orlov",
-                ],
-            },
-        ]
+        try:
+            with open(json_path, encoding="utf-8") as f:
+                catalogue = json.load(f)
+        except FileNotFoundError:
+            self.stdout.write(self.style.ERROR(f"Файл не найден: {json_path}"))
+            return
+        except json.JSONDecodeError as e:
+            self.stdout.write(self.style.ERROR(f"Ошибка разбора JSON: {e}"))
+            return
 
         if wipe:
             self.wipe_projects(target_user)

@@ -7,11 +7,11 @@ SECRET_KEY = config("DJANGO_SECRET_KEY")
 
 DEBUG = config("DJANGO_DEBUG", default=False, cast=bool)
 
-ALLOWED_HOSTS = ["*"]
+ALLOWED_HOSTS = config("DJANGO_ALLOWED_HOSTS", default="localhost,127.0.0.1").split(",")
 
 AUTH_USER_MODEL = "users.User"
 
-LOGIN_URL = "/users/login/"
+LOGIN_URL = "users:login"
 
 
 # Application definition

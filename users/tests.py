@@ -1,8 +1,9 @@
 import json
 
+from django.contrib.auth import get_user_model
 from django.test import Client, TestCase
 
-from users.models import User
+User = get_user_model()
 
 
 class UserRegistrationTest(TestCase):
@@ -18,7 +19,7 @@ class UserRegistrationTest(TestCase):
             },
         )
         self.assertEqual(response.status_code, 302)
-        self.assertEqual(response["Location"], "/users/login/")
+        self.assertEqual(response["Location"], "/projects/list/")
         self.assertTrue(User.objects.filter(email="test@example.com").exists())
 
     def test_login_with_email(self):

@@ -1,7 +1,9 @@
+from django.contrib.auth import get_user_model
 from django.test import Client, TestCase
 
 from projects.models import Project
-from users.models import User
+
+User = get_user_model()
 
 
 class ProjectTest(TestCase):

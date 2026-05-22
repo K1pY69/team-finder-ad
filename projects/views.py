@@ -15,7 +15,7 @@ from users.service import handle_skill_add
 
 def project_list(request):
     projects = Project.objects.select_related("owner").prefetch_related("participants")
-    page = paginate(projects, request.GET.get("page"))
+    page = paginate(projects, request)
     return render(request, "projects/project_list.html", {"projects": page})
 
 

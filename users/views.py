@@ -19,13 +19,14 @@ def register_view(request):
     form = RegisterForm(request.POST or None)
     if form.is_valid():
         data = form.cleaned_data
-        User.objects.create_user(
+        user = User.objects.create_user(
             email=data["email"],
             name=data["name"],
             surname=data["surname"],
             password=data["password"],
         )
-        return redirect("users:login")
+        login(request, user)
+        return redirect("projects:list")
     return render(request, "users/register.html", {"form": form})
 
 

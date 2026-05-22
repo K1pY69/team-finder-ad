@@ -1,11 +1,12 @@
 import re
 
 from django import forms
-from django.contrib.auth import authenticate
+from django.contrib.auth import authenticate, get_user_model
 
 from team_finder.mixins import GithubUrlMixin
 from users.constants import NAME_MAX_LENGTH
-from users.models import User
+
+User = get_user_model()
 
 
 class RegisterForm(forms.Form):
@@ -13,6 +14,12 @@ class RegisterForm(forms.Form):
     surname = forms.CharField(max_length=NAME_MAX_LENGTH, label="Фамилия")
     email = forms.EmailField(label="Email")
     password = forms.CharField(widget=forms.PasswordInput, label="Пароль")
+
+    def clean_email(self):
+        email = self.cleaned_data["email"]
+        if User.objects.filter(email__iexact=email).exists():
+            raise forms.ValidationError("Пользователь с таким email уже зарегистрирован")
+        return email
 
 
 class LoginForm(forms.Form):

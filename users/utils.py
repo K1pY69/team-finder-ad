@@ -1,5 +1,6 @@
 import random
 from io import BytesIO
+from pathlib import Path
 from uuid import uuid4
 
 from django.core.files.base import ContentFile
@@ -22,12 +23,14 @@ PASTEL_COLORS = [
 ]
 
 _DEJAVU_FONT_NAME = "DejaVuSans-Bold.ttf"
+_USR_SHARE_FONTS = Path("/usr/share/fonts")
+_SYSTEM_LIBRARY_FONTS = Path("/System/Library/Fonts")
 
 _FONT_PATHS = [
-    f"/usr/share/fonts/truetype/dejavu/{_DEJAVU_FONT_NAME}",
-    f"/usr/share/fonts/dejavu/{_DEJAVU_FONT_NAME}",
-    "/System/Library/Fonts/Helvetica.ttc",
-    "/System/Library/Fonts/Arial.ttf",
+    _USR_SHARE_FONTS / "truetype" / "dejavu" / _DEJAVU_FONT_NAME,
+    _USR_SHARE_FONTS / "dejavu" / _DEJAVU_FONT_NAME,
+    _SYSTEM_LIBRARY_FONTS / "Helvetica.ttc",
+    _SYSTEM_LIBRARY_FONTS / "Arial.ttf",
 ]
 
 AVATAR_SIZE = 200

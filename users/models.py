@@ -31,7 +31,6 @@ class User(AbstractBaseUser, PermissionsMixin):
     avatar = models.ImageField(upload_to="avatars/", blank=True, verbose_name="Аватар")
     phone = models.CharField(
         max_length=PHONE_MAX_LENGTH,
-        blank=True,
         null=True,
         unique=True,
         verbose_name="Телефон",

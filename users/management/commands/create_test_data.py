@@ -1,10 +1,13 @@
 import json
 from pathlib import Path
 
+from django.contrib.auth import get_user_model
 from django.core.management.base import BaseCommand
 
 from projects.models import Project
-from users.models import Skill, User
+from users.models import Skill
+
+User = get_user_model()
 
 DEFAULT_DATA_FILE = Path(__file__).parent / "test_data.json"
 

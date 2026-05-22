@@ -6,6 +6,7 @@ class UserManager(BaseUserManager):
         if not email:
             raise ValueError("Email обязателен")
         email = self.normalize_email(email)
+        extra_fields.setdefault("phone", None)
         user = self.model(email=email, name=name, surname=surname, **extra_fields)
         user.set_password(password)
         user.save(using=self._db)

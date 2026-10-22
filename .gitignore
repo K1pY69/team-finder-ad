@@ -146,3 +146,8 @@ dmypy.json
 .ruff_cache/
 
 *.Identifier
+
+# локальные данные
+creds.txt
+.DS_Store
+.env
